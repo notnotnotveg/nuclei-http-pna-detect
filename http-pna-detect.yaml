@@ -1,0 +1,37 @@
+id: http-pna-detect
+
+info:
+  name: Private Network Access (PNA) Detection
+  author: notnotnotveg (wiki.notveg.ninja)
+  description: |
+    Detects if the server responds with Access-Control-Allow-Private-Network in response to a PNA preflight request.
+  severity: info
+  metadata:
+    max-request: 1
+  tags: miscellaneous,pna,cors
+
+http:
+  - method: OPTIONS
+    headers:
+      Origin: example.com
+      Access-Control-Request-Method: GET
+      Access-Control-Request-Private-Network: true
+    path:
+      - "{{BaseURL}}"
+
+
+    extractors:
+      - type: regex
+        part: header
+        name: Access-Control-Allow-Origin
+        group: 1
+        regex:
+          # case-insensitive, multiline; capture the header's value (non-greedy)
+          - "(?im)^[ \\t]*Access-Control-Allow-Origin:\\s*(.+?)\\s*$"
+
+      - type: regex
+        part: header
+        name: Access-Control-Allow-Private-Network
+        group: 1
+        regex:
+          - "(?im)^[ \\t]*Access-Control-Allow-Private-Network:\\s*(.+?)\\s*$"
